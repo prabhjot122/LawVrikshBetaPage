@@ -34,21 +34,49 @@ CORS(app, origins=cors_origins)
 
 # Database configuration
 DATABASE_URL = os.environ.get('DATABASE_URL')
-if DATABASE_URL:
-    # Production database (if using cloud provider)
-    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
-else:
-    # Use SQLite for local development and production
-    # Use instance folder for database file
-    db_path = os.path.join(app.instance_path, 'feedback.db')
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
-    logger.info(f'Using SQLite database at: {db_path}')
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+if DATABASE_URL:
+    # Production database (MySQL from Aiven or other providers)
+    # Handle Aiven's MySQL URL format - convert mysql:// to mysql+pymysql://
+    if DATABASE_URL.startswith('mysql://'):
+        DATABASE_URL = DATABASE_URL.replace('mysql://', 'mysql+pymysql://', 1)
+
+    # Handle SSL mode parameter for Aiven
+    if '?ssl-mode=REQUIRED' in DATABASE_URL:
+        DATABASE_URL = DATABASE_URL.replace('?ssl-mode=REQUIRED', '')
+        # SSL will be handled by engine options below
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+    logger.info('Using production MySQL database from DATABASE_URL')
+else:
+    # Local development - use MySQL with environment variables
+    DB_HOST = os.environ.get('DB_HOST', 'localhost')
+    DB_USER = os.environ.get('DB_USER', 'root')
+    DB_PASSWORD = os.environ.get('DB_PASSWORD', '')
+    DB_NAME = os.environ.get('DB_NAME', 'lawvriksh_db')
+    DB_PORT = os.environ.get('DB_PORT', '3306')
+
+    # Construct MySQL connection string with PyMySQL driver
+    mysql_url = f'mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+    app.config['SQLALCHEMY_DATABASE_URI'] = mysql_url
+    logger.info(f'Using local MySQL database: {DB_HOST}:{DB_PORT}/{DB_NAME}')
+
+# MySQL-specific configuration
+engine_options = {
     'pool_pre_ping': True,
     'pool_recycle': 300,
+    'pool_timeout': 20,
+    'pool_size': 5,
+    'max_overflow': 10,
 }
+
+# Add SSL configuration for production (Aiven)
+if DATABASE_URL and ('aiven' in DATABASE_URL or 'ssl-mode' in os.environ.get('DATABASE_URL', '')):
+    engine_options['connect_args'] = {'ssl': {}}
+
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = engine_options
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
@@ -57,16 +85,16 @@ class UserRegistration(db.Model):
     __tablename__ = 'user_registrations'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    email = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(255), nullable=False, index=True)
+    email = db.Column(db.String(255), nullable=False, index=True)
     phone = db.Column(db.String(20), nullable=False)
     gender = db.Column(db.String(50), nullable=True)
     profession = db.Column(db.String(255), nullable=True)
-    user_type = db.Column(db.String(20), nullable=False)  # 'USER' or 'Creator'
+    user_type = db.Column(db.String(20), nullable=False, index=True)  # 'USER' or 'Creator'
 
     # Metadata
-    submitted_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    ip_address = db.Column(db.String(45), nullable=True)
+    submitted_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    ip_address = db.Column(db.String(45), nullable=True)  # Support IPv4 and IPv6
     user_agent = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
@@ -115,7 +143,7 @@ class Feedback(db.Model):
     contact_email = db.Column(db.String(255), nullable=True)
     
     # Metadata
-    submitted_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    submitted_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     ip_address = db.Column(db.String(45), nullable=True)  # Support IPv6
     user_agent = db.Column(db.Text, nullable=True)
     
@@ -586,12 +614,15 @@ def create_tables():
     """Create database tables"""
     try:
         with app.app_context():
-            # Ensure instance directory exists
-            os.makedirs(app.instance_path, exist_ok=True)
+            # Create all tables
             db.create_all()
-            logger.info('Database tables created successfully')
+            logger.info('Database tables created successfully using MySQL')
+            logger.info('Tables created: user_registrations, feedback')
+
     except Exception as e:
         logger.error(f'Error creating database tables: {str(e)}')
+        # Re-raise the exception so the app doesn't start with a broken database
+        raise
 
 if __name__ == '__main__':
     create_tables()

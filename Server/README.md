@@ -12,6 +12,15 @@ A Flask-based REST API for handling feedback form submissions with MySQL databas
 - ✅ Production-ready with Gunicorn
 - ✅ Render.com deployment configuration
 - ✅ Admin API for retrieving feedback data
+- ✅ Separate SQL schema files for database setup
+
+## Database Files
+
+- **`schema.sql`** - Complete MySQL database schema with CREATE TABLE statements
+- **`init_mysql.py`** - Python script to initialize database using schema.sql
+- **`setup_database.sh`** - Shell script for Linux/macOS database setup
+- **`setup_database.bat`** - Batch script for Windows database setup
+- **`MYSQL_SETUP.md`** - Comprehensive MySQL setup guide
 
 ## Quick Start
 
@@ -25,21 +34,44 @@ A Flask-based REST API for handling feedback form submissions with MySQL databas
 
 2. **Set up MySQL Database**
    ```sql
-   CREATE DATABASE lawvriksh_feedback;
+   CREATE DATABASE lawvriksh_db;
    CREATE USER 'lawvriksh_user'@'localhost' IDENTIFIED BY 'your_password';
-   GRANT ALL PRIVILEGES ON lawvriksh_feedback.* TO 'lawvriksh_user'@'localhost';
+   GRANT ALL PRIVILEGES ON lawvriksh_db.* TO 'lawvriksh_user'@'localhost';
    FLUSH PRIVILEGES;
    ```
 
 3. **Configure Environment Variables**
    ```bash
    cp .env.example .env
-   # Edit .env with your database credentials
+   # Edit .env with your MySQL database credentials:
+   # DB_HOST=localhost
+   # DB_USER=lawvriksh_user
+   # DB_PASSWORD=your_password
+   # DB_NAME=lawvriksh_db
+   # DB_PORT=3306
    ```
 
 4. **Initialize Database**
+
+   **Option A: Using SQL file (Recommended)**
    ```bash
-   python init_db.py
+   # Linux/macOS
+   cd backend
+   ./setup_database.sh
+
+   # Windows
+   cd backend
+   setup_database.bat
+   ```
+
+   **Option B: Using Python script**
+   ```bash
+   python init_mysql.py
+   ```
+
+   **Option C: Manual MySQL command**
+   ```bash
+   mysql -u lawvriksh_user -p lawvriksh_feedback < schema.sql
    ```
 
 5. **Run Development Server**
@@ -58,10 +90,14 @@ The API will be available at `http://localhost:5000`
    git push origin main
    ```
 
-2. **Deploy on Render.com**
+2. **Set up MySQL Database on Aiven**
+   - Create a MySQL database on Aiven.io
+   - Get the connection string (DATABASE_URL)
+
+3. **Deploy on Render.com**
    - Connect your GitHub repository
    - Render will automatically detect the `render.yaml` file
-   - Set up the MySQL database service
+   - Set the DATABASE_URL environment variable with your Aiven MySQL connection string
    - Deploy the web service
 
 ## API Endpoints
