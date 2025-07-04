@@ -17,14 +17,20 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # CORS configuration
-CORS(app, origins=[
+cors_origins = [
     "http://localhost:3000",
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:5175",
-    "https://lawvrikshbetapage.onrender.com",
-    "https://your-frontend-domain.com"  # Replace with your actual frontend domain
-])
+    "https://lawvrikshbetapage.onrender.com"
+]
+
+# Add production origins from environment variable
+if os.environ.get('CORS_ORIGINS'):
+    production_origins = os.environ.get('CORS_ORIGINS').split(',')
+    cors_origins.extend([origin.strip() for origin in production_origins])
+
+CORS(app, origins=cors_origins)
 
 # Database configuration
 DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -311,6 +317,20 @@ def generate_excel_report():
         return None
 
 # API Routes
+@app.route('/')
+def home():
+    """Root endpoint"""
+    return jsonify({
+        'message': 'LawVriksh Feedback API',
+        'version': '1.0.0',
+        'endpoints': {
+            'health': '/api/health',
+            'register': '/api/register',
+            'feedback': '/api/feedback',
+            'admin': '/admin'
+        }
+    })
+
 @app.route('/admin')
 def admin_dashboard():
     """Admin dashboard for managing data and downloading Excel files"""
