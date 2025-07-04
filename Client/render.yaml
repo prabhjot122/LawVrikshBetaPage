@@ -1,27 +1,11 @@
 services:
   # Backend API Service
-  - type: web
-    name: lawvriksh-feedback-api
-    runtime: python3
-    buildCommand: "cd backend && pip install -r requirements.txt"
-    startCommand: "cd backend && gunicorn --bind 0.0.0.0:$PORT app:app"
-    plan: free
-    region: oregon
-    branch: main
-    rootDir: .
-    envVars:
-      - key: FLASK_ENV
-        value: production
-      - key: ADMIN_API_KEY
-        generateValue: true
-      - key: PYTHONPATH
-        value: /opt/render/project/src/backend
 
   # Frontend Service (if you want to deploy frontend on Render too)
   - type: web
     name: lawvriksh-frontend
     runtime: node
-    buildCommand: "npm ci && npm run build:prod"
+    buildCommand: "npm install && npm run build:prod"
     startCommand: "npm run preview -- --host 0.0.0.0 --port $PORT"
     plan: free
     region: oregon
