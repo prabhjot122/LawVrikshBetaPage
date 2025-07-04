@@ -18,3 +18,5 @@ services:
         value: /opt/render/project/src/backend
       - key: PIP_NO_CACHE_DIR
         value: "1"
+      - key: PYTHON_VERSION
+        value: "3.11"
