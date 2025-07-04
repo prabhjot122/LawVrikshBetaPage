@@ -3,8 +3,8 @@ services:
   - type: web
     name: lawvriksh-feedback-api
     runtime: python3
-    buildCommand: "pip install --upgrade pip && cd backend && pip install -r requirements.txt"
-    startCommand: "cd backend && gunicorn --bind 0.0.0.0:$PORT app:app"
+    buildCommand: "cd backend && pip install --no-deps -r requirements.txt || pip install -r requirements.txt"
+    startCommand: "cd backend && python -m gunicorn --bind 0.0.0.0:$PORT app:app"
     plan: free
     region: oregon
     branch: main
@@ -16,7 +16,5 @@ services:
         generateValue: true
       - key: PYTHONPATH
         value: /opt/render/project/src/backend
-
-
-
-# No external database needed - using SQLite
+      - key: PIP_NO_CACHE_DIR
+        value: "1"
