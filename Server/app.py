@@ -39,8 +39,10 @@ if DATABASE_URL:
     app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 else:
     # Use SQLite for local development and production
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///feedback.db'
-    logger.info('Using SQLite database')
+    # Use instance folder for database file
+    db_path = os.path.join(app.instance_path, 'feedback.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+    logger.info(f'Using SQLite database at: {db_path}')
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
@@ -584,6 +586,8 @@ def create_tables():
     """Create database tables"""
     try:
         with app.app_context():
+            # Ensure instance directory exists
+            os.makedirs(app.instance_path, exist_ok=True)
             db.create_all()
             logger.info('Database tables created successfully')
     except Exception as e:
