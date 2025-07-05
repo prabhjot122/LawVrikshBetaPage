@@ -7,7 +7,7 @@ const MAIN_IMAGE_URL = "/hero.png";
 
 function HomePage() {
   const [showPopup, setShowPopup] = useState(false);
-  const [popupType, setPopupType] = useState<'form' | 'thankyou' | 'features' | 'feedback'>('form');
+  const [popupType, setPopupType] = useState<'form' | 'thankyou' | 'features' | 'feedback' | 'viewmore'>('form');
   const [userType, setUserType] = useState<'USER' | 'Creator'>('USER');
   const [isNotInterested, setIsNotInterested] = useState(false);
   const [formData, setFormData] = useState({
@@ -65,6 +65,11 @@ function HomePage() {
 
   const handleFeedbackClick = () => {
     setPopupType('feedback');
+    setShowPopup(true);
+  };
+
+  const handleViewMoreClick = () => {
+    setPopupType('viewmore');
     setShowPopup(true);
   };
 
@@ -204,11 +209,8 @@ function HomePage() {
         <header className="header">
           <img src={LOGO_URL} alt="LawVriksh Logo" className="logo" />
           <nav className="navigation">
-            <button className="nav-button" onClick={handleFeaturesClick}>
-              See our Features
-            </button>
-            <button className="nav-button" onClick={handleFeedbackClick}>
-              Suggestion &amp; Feedback
+            <button className="nav-button view-more-btn" onClick={handleViewMoreClick}>
+              View More
             </button>
           </nav>
         </header>
@@ -739,6 +741,18 @@ function HomePage() {
                   <button className="submit-button" onClick={closePopup}>
                     Close
                   </button>
+                </div>
+              ) : popupType === 'viewmore' ? (
+                <div className="popup-content viewmore-content">
+                  <h2 className="popup-title">Explore More</h2>
+                  <div className="viewmore-buttons">
+                    <button className="viewmore-button" onClick={handleFeedbackClick}>
+                      Suggestion & Feedback
+                    </button>
+                    <button className="viewmore-button" onClick={handleFeaturesClick}>
+                      View Features
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="popup-content features-content">
