@@ -209,7 +209,7 @@ function HomePage() {
         <header className="header">
           <img src={LOGO_URL} alt="LawVriksh Logo" className="logo" />
           <nav className="navigation">
-            <button className="nav-button view-more-btn" onClick={handleViewMoreClick}>
+            <button className="nav-button" onClick={handleViewMoreClick}>
               View More
             </button>
           </nav>
