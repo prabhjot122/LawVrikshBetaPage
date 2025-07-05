@@ -22,7 +22,8 @@ cors_origins = [
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:5175",
-    "https://lawvrikshbetapage.onrender.com"
+    "https://lawvrikshbetapage.onrender.com",
+    "https://preorder.lawvriksh.com/"
 ]
 
 # Add production origins from environment variable
