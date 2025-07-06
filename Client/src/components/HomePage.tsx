@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./HomePage.css";
+import Header from "./Header";
 
 // Image URLs from public folder
-const LOGO_URL = "/logo.png";
 const MAIN_IMAGE_URL = "/hero.png";
 
 function HomePage() {
@@ -142,7 +142,7 @@ function HomePage() {
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/feedback`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/feedback`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -206,14 +206,7 @@ function HomePage() {
         rel="stylesheet"
       />
       <div className="homepage-container">
-        <header className="header">
-          <img src={LOGO_URL} alt="LawVriksh Logo" className="logo" />
-          <nav className="navigation">
-            <button className="nav-button" onClick={handleViewMoreClick}>
-              View More
-            </button>
-          </nav>
-        </header>
+        <Header onViewMoreClick={handleViewMoreClick} />
 
         <main className="main-content">
           <section className="content-section">

@@ -1,206 +1,47 @@
 /* HomePage Styles */
+:root {
+  --header-height-desktop: 140px; /* 80px height + 30px top + 30px bottom padding */
+  --header-height-tablet: 120px; /* Approximate height for tablet */
+  --header-height-mobile: 100px; /* Approximate height for mobile */
+}
 .homepage-container {
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   position: relative;
   background-color: #2C2A23;
   font-family: "Poppins", sans-serif;
   overflow-x: hidden;
+  overflow-y:hidden;
+  /* Add top padding to push content below sticky header */
+  padding-top: var(--header-height-desktop);
+  box-sizing: border-box;
 }
 
 @media (max-width: 991px) {
   .homepage-container {
-    height: auto;
     min-height: 100vh;
+    padding-top: var(--header-height-tablet);
   }
 }
 
 @media (max-width: 768px) {
   .homepage-container {
     padding: 0;
+    padding-top: var(--header-height-mobile);
     overflow-x: hidden;
+    min-height: 100vh;
   }
 }
 
-/* Header Styles */
-.header {
-  display: flex;
-  width: calc(100% - 120px);
-  justify-content: space-between;
-  align-items: center;
-  position: absolute;
-  left: 60px;
-  top: 30px;
-  height: 80px;
-  z-index: 10;
-}
 
-@media (max-width: 991px) {
-  .header {
-    position: relative;
-    left: 0;
-    top: 0;
-    width: 100%;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-}
 
-@media (max-width: 640px) {
-  .header {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-    height: auto;
-  }
-}
-
-.logo {
-  width: 160px;
-  height: 92px;
-  flex-shrink: 0;
-  object-fit: contain;
-}
-
-@media (max-width: 768px) {
-  .logo {
-    width: 120px;
-    height: 69px;
-  }
-}
-
-@media (max-width: 480px) {
-  .logo {
-    width: 100px;
-    height: 57px;
-  }
-}
-
-.navigation {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-}
-
-@media (max-width: 640px) {
-  .navigation {
-    flex-direction: row;
-    width: auto;
-    gap: 10px;
-  }
-}
-
-.nav-button {
-  display: flex;
-  padding: 12px 32px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50px;
-  border:3px solid ;
-  background-color: #2C2A23;
-  color: #B8860B;
-  font: 500 16px/1.2 Poppins;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  position: relative;
-}
-
-.nav-button::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: url('/gold.jpg');
-  background-size: cover;
-  background-position: center;
-  border-radius: 50px;
-  z-index: -1;
-
-}
-
-.nav-button::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: #fffaea;
-  border-radius: 50px;
-  z-index: -1;
-}
-
-@media (max-width: 768px) {
-  .nav-button {
-    padding: 10px 24px;
-    font-size: 14px;
-  }
-}
-
-@media (max-width: 640px) {
-  .nav-button {
-    width: auto;
-    max-width: 120px;
-    text-align: center;
-    padding: 8px 16px;
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .nav-button {
-    padding: 6px 12px;
-    font-size: 11px;
-    max-width: 100px;
-  }
-}
-
-.view-more-btn {
-  background: transparent;
-  color: #B8860B;
-  text-shadow: none;
-  border: 3px solid;
-  position: relative;
-}
-
-.view-more-btn::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: url('/gold.jpg');
-  background-size: cover;
-  background-position: center;
-  border-radius: 50px;
-  z-index: -1;
-}
-
-.view-more-btn::after {
-  display: none;
-}
-
-.nav-button:hover {
-  background: url('/gold.jpg');
-  background-size: cover;
-  background-position: center;
-  color: #fff;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-  border: 2px solid #B8860B;
-}
 
 /* Main Content Styles */
 .main-content {
   display: flex;
   width: 100%;
-  height: calc(100vh - 140px);
+  min-height: calc(100vh - var(--header-height-desktop));
   position: relative;
-  padding-top: 140px;
   align-items: center;
 }
 
@@ -208,15 +49,20 @@
   .main-content {
     flex-direction: column;
     align-items: center;
-    height: auto;
-    padding-top: 30px;
+    min-height: calc(100vh - var(--header-height-tablet));
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    min-height: calc(100vh - var(--header-height-mobile));
   }
 }
 
 .content-section {
   width: 100%;
   max-width: fit-content;
-  padding: 100px 60px 0 80px;
+  padding: 0 60px 0 80px; /* No top padding needed since container handles spacing */
   display: flex;
   flex-direction: column;
   justify-content: center;
